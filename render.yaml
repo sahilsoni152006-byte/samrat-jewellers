@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: samrat-jewellers
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: FIREBASE_DATABASE_URL
+        value: https://samrat-4d6b3-default-rtdb.firebaseio.com/
