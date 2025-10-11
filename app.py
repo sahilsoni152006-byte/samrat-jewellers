@@ -12,17 +12,31 @@ app.secret_key = 'your-secret-key'
 app.config['UPLOAD_FOLDER'] = 'static/images/products'
 
 # Initialize Firebase
+import json
+
+# Create Firebase config from environment variables
+firebase_config = {
+    "type": "service_account",
+    "project_id": "samrat-4d6b3",
+    "private_key_id": os.environ.get('FIREBASE_PRIVATE_KEY_ID'),
+    "private_key": os.environ.get('FIREBASE_PRIVATE_KEY', '').replace('\\n', '\n'),
+    "client_email": os.environ.get('FIREBASE_CLIENT_EMAIL'),
+    "client_id": os.environ.get('FIREBASE_CLIENT_ID'),
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": f"https://www.googleapis.com/robot/v1/metadata/x509/{os.environ.get('FIREBASE_CLIENT_EMAIL', '')}"
+}
+
+# Try local config first, then environment variables
 try:
-    # Try to use firebase_config.json if it exists (local development)
     cred = credentials.Certificate('firebase_config.json')
-    firebase_admin.initialize_app(cred, {
-        'databaseURL': 'https://samrat-4d6b3-default-rtdb.firebaseio.com/'
-    })
 except FileNotFoundError:
-    # For production without credentials, use anonymous access
-    firebase_admin.initialize_app(options={
-        'databaseURL': os.environ.get('FIREBASE_DATABASE_URL', 'https://samrat-4d6b3-default-rtdb.firebaseio.com/')
-    })
+    cred = credentials.Certificate(firebase_config)
+
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://samrat-4d6b3-default-rtdb.firebaseio.com/'
+})
 
 def init_firebase():
     # Check if database is already initialized
