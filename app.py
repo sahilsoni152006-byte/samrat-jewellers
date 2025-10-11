@@ -27,14 +27,14 @@ def init_firebase():
     print("Initializing Firebase database...")
     
     # Initialize admin user
-    admin_hash = generate_password_hash('admin123')
+    admin_hash = generate_password_hash('samrat@2024')
     admin_data = {
-        'name': 'Admin',
-        'email': 'admin@samratjewellers.com',
+        'name': 'Samrat Admin',
+        'email': 'samrat@samratjewellers.com',
         'password_hash': admin_hash,
         'role': 'admin'
     }
-    db.reference('users').child('admin').set(admin_data)
+    db.reference('users').child('samrat_admin').set(admin_data)
     
     # Initialize metal rates
     rates_data = {
