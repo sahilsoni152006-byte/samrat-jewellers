@@ -1,0 +1,252 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Metal Rates{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div class="header-left">
+        <h1><i class="fas fa-chart-line"></i> Metal Rates Management</h1>
+    </div>
+    <div class="header-right">
+        <button onclick="exportRates()" class="btn btn-secondary">
+            <i class="fas fa-download"></i> Export Excel
+        </button>
+    </div>
+</div>
+
+<div class="rates-section">
+    <div class="current-rates">
+        <h2>Current Metal Rates</h2>
+        <div class="table-container">
+            <table class="admin-table" id="ratesTable">
+                <thead>
+                    <tr>
+                        <th>Metal</th>
+                        <th>Rate per Gram</th>
+                        <th>Source</th>
+                        <th>Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if rates.gold %}
+                    <tr>
+                        <td><i class="fas fa-coins"></i> Gold</td>
+                        <td>₹{{ "%.2f"|format(rates.gold.rate_per_gram) }}</td>
+                        <td>{{ rates.gold.source }}</td>
+                        <td>{{ rates.gold.fetched_at[:19] if rates.gold.fetched_at else 'N/A' }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if rates.silver %}
+                    <tr>
+                        <td><i class="fas fa-medal"></i> Silver</td>
+                        <td>₹{{ "%.2f"|format(rates.silver.rate_per_gram) }}</td>
+                        <td>{{ rates.silver.source }}</td>
+                        <td>{{ rates.silver.fetched_at[:19] if rates.silver.fetched_at else 'N/A' }}</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        <div class="rates-grid">
+            {% if rates.gold %}
+            <div class="rate-card">
+                <div class="rate-header">
+                    <i class="fas fa-coins"></i>
+                    <h3>Gold</h3>
+                </div>
+                <div class="rate-info">
+                    <div class="rate-price">₹{{ "%.2f"|format(rates.gold.rate_per_gram) }}/gram</div>
+                    <div class="rate-source">Source: {{ rates.gold.source }}</div>
+                    <div class="rate-time">
+                        {% set time_diff = 15 %}
+                        Last updated: 
+                        {% if time_diff < 60 %}
+                            {{ "%.0f"|format(time_diff) }} minutes ago
+                        {% else %}
+                            {{ "%.1f"|format(time_diff/60) }} hours ago
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if rates.silver %}
+            <div class="rate-card">
+                <div class="rate-header">
+                    <i class="fas fa-medal"></i>
+                    <h3>Silver</h3>
+                </div>
+                <div class="rate-info">
+                    <div class="rate-info">
+                    <div class="rate-price">₹{{ "%.2f"|format(rates.silver.rate_per_gram) }}/gram</div>
+                    <div class="rate-source">Source: {{ rates.silver.source }}</div>
+                    <div class="rate-time">
+                        {% set time_diff = 40 %}
+                        Last updated: 
+                        {% if time_diff < 60 %}
+                            {{ "%.0f"|format(time_diff) }} minutes ago
+                        {% else %}
+                            {{ "%.1f"|format(time_diff/60) }} hours ago
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="update-rates">
+        <h2>Update Metal Rates</h2>
+        <div class="update-options">
+            <div class="update-card">
+                <h3><i class="fas fa-edit"></i> Manual Update</h3>
+                <p>Manually set the current metal rates and margin percentages</p>
+                
+                <form method="POST" action="{{ url_for('admin_update_rates') }}" class="rates-form">
+                    <div class="form-grid">
+                        <div class="form-section">
+                            <h4>Gold Rate</h4>
+                            <div class="form-group">
+                                <label for="gold_rate">Rate per gram (₹)</label>
+                                <input type="number" id="gold_rate" name="gold_rate" step="0.01" 
+                                       value="{{ rates.gold.rate_per_gram if rates.gold else 6500 }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h4>Silver Rate</h4>
+                            <div class="form-group">
+                                <label for="silver_rate">Rate per gram (₹)</label>
+                                <input type="number" id="silver_rate" name="silver_rate" step="0.01" 
+                                       value="{{ rates.silver.rate_per_gram if rates.silver else 85 }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Rates
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="update-card">
+                <h3><i class="fas fa-sync"></i> API Integration</h3>
+                <p>Integrate with live metal rates API for automatic updates</p>
+                
+                <div class="api-info">
+                    <div class="info-item">
+                        <strong>Current Status:</strong> Manual Updates Only
+                    </div>
+                    <div class="info-item">
+                        <strong>API Integration:</strong> Not Configured
+                    </div>
+                    <div class="info-item">
+                        <strong>Auto Update:</strong> Disabled
+                    </div>
+                </div>
+                
+                <div class="api-instructions">
+                    <h4>To Enable API Integration:</h4>
+                    <ol>
+                        <li>Sign up for a metal rates API service (e.g., metals-api.com, goldapi.io)</li>
+                        <li>Get your API key</li>
+                        <li>Update the <code>update_metal_rates_api()</code> function in <code>app.py</code></li>
+                        <li>Replace the sample API call with your actual API endpoint</li>
+                        <li>Set up a cron job or scheduler to call the update function regularly</li>
+                    </ol>
+                </div>
+                
+                <button class="btn btn-outline" disabled>
+                    <i class="fas fa-code"></i> Configure API (Coming Soon)
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="rate-calculator">
+        <h2>Price Calculator</h2>
+        <div class="calculator-card">
+            <p>Use this calculator to see how prices are calculated for per-gram products</p>
+            
+            <div class="calc-form">
+                <div class="calc-inputs">
+                    <div class="form-group">
+                        <label for="calc_metal">Metal Type</label>
+                        <select id="calc_metal" onchange="updateCalculator()">
+                            <option value="gold">Gold</option>
+                            <option value="silver">Silver</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="calc_weight">Weight (grams)</label>
+                        <input type="number" id="calc_weight" step="0.001" value="10" onchange="updateCalculator()">
+                    </div>
+                </div>
+                
+                <div class="calc-result">
+                    <div class="calc-breakdown">
+                        <div class="calc-line">
+                            <span>Base Rate:</span>
+                            <span id="calc_base_rate">₹0.00/g</span>
+                        </div>
+                        <div class="calc-line">
+                            <span>Margin:</span>
+                            <span id="calc_margin">0%</span>
+                        </div>
+                        <div class="calc-line">
+                            <span>Final Rate:</span>
+                            <span id="calc_final_rate">₹0.00/g</span>
+                        </div>
+                        <div class="calc-line total">
+                            <span>Total Price:</span>
+                            <span id="calc_total">₹0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const rates = {
+    gold: {
+        rate: {{ rates.gold.rate_per_gram if rates.gold else 6500 }},
+        margin: {{ rates.gold.margin_percent if rates.gold else 10 }}
+    },
+    silver: {
+        rate: {{ rates.silver.rate_per_gram if rates.silver else 85 }},
+        margin: {{ rates.silver.margin_percent if rates.silver else 15 }}
+    }
+};
+
+function updateCalculator() {
+    const metal = document.getElementById('calc_metal').value;
+    const weight = parseFloat(document.getElementById('calc_weight').value) || 0;
+    
+    const baseRate = rates[metal].rate;
+    const margin = rates[metal].margin;
+    const finalRate = baseRate * (1 + margin / 100);
+    const totalPrice = finalRate * weight;
+    
+    document.getElementById('calc_base_rate').textContent = `₹${baseRate.toFixed(2)}/g`;
+    document.getElementById('calc_margin').textContent = `${margin}%`;
+    document.getElementById('calc_final_rate').textContent = `₹${finalRate.toFixed(2)}/g`;
+    document.getElementById('calc_total').textContent = `₹${totalPrice.toFixed(2)}`;
+}
+
+// Initialize calculator
+document.addEventListener('DOMContentLoaded', function() {
+    updateCalculator();
+});
+
+function exportRates() {
+    const table = document.getElementById('ratesTable');
+    const wb = XLSX.utils.table_to_book(table, {sheet: "Metal Rates"});
+    XLSX.writeFile(wb, 'samrat_jewellers_rates.xlsx');
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+{% endblock %}

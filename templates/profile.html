@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Samrat Jewellers{% endblock %}
+
+{% block content %}
+<section class="profile-section">
+    <div class="container">
+        {% if session.user_mobile %}
+        <div class="profile-content">
+            <div class="profile-card">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h3>{{ session.user_name }}</h3>
+                <p>Mobile: {{ session.user_mobile }}</p>
+                
+                <div class="profile-actions">
+                    <a href="{{ url_for('contact') }}" class="btn btn-primary">
+                        <i class="fas fa-phone"></i> Contact Us
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline">Logout</a>
+                </div>
+                
+                <div class="profile-info">
+                    <div class="info-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>Member since {{ session.user_registered }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="login-content">
+            <div class="login-card">
+                <h3>Login / Register</h3>
+                <p>Enter your mobile number to continue</p>
+                
+                <form id="loginForm" method="POST" action="{{ url_for('user_login') }}">
+                    <div class="form-group">
+                        <label>Mobile Number</label>
+                        <input type="tel" name="mobile" id="mobile" placeholder="Enter 10-digit mobile number" required maxlength="10" pattern="[0-9]{10}">
+                    </div>
+                    
+                    <div class="form-group" id="nameGroup" style="display: none;">
+                        <label>Full Name</label>
+                        <input type="text" name="name" id="name" placeholder="Enter your full name">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Continue</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+document.getElementById('mobile').addEventListener('input', function() {
+    const mobile = this.value;
+    if (mobile.length === 10) {
+        fetch('/check-user', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({mobile: mobile})
+        })
+        .then(response => response.json())
+        .then(data => {
+            const nameGroup = document.getElementById('nameGroup');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (data.exists) {
+                nameGroup.style.display = 'none';
+                submitBtn.textContent = 'Login';
+            } else {
+                nameGroup.style.display = 'block';
+                document.getElementById('name').required = true;
+                submitBtn.textContent = 'Register';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Edit Product{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h2><i class="fas fa-edit"></i> Edit Product</h2>
+        <a href="{{ url_for('admin_products') }}" class="btn btn-outline">
+            <i class="fas fa-arrow-left"></i> Back to Products
+        </a>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="product-form">
+        <div class="form-grid">
+            <div class="form-section">
+                <h3>Basic Information</h3>
+                
+                <div class="form-group">
+                    <label for="name">Product Name *</label>
+                    <input type="text" id="name" name="name" value="{{ product[1] }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sku">SKU *</label>
+                    <input type="text" id="sku" name="sku" value="{{ product[2] }}" required>
+                    <small>Unique product identifier</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">Category *</label>
+                    <select id="category" name="category" required>
+                        <option value="">Select Category</option>
+                        <option value="Necklaces" {% if product[3] == 'Necklaces' %}selected{% endif %}>Necklaces</option>
+                        <option value="Earrings" {% if product[3] == 'Earrings' %}selected{% endif %}>Earrings</option>
+                        <option value="Rings" {% if product[3] == 'Rings' %}selected{% endif %}>Rings</option>
+                        <option value="Bracelets" {% if product[3] == 'Bracelets' %}selected{% endif %}>Bracelets</option>
+                        <option value="Pendants" {% if product[3] == 'Pendants' %}selected{% endif %}>Pendants</option>
+                        <option value="Chains" {% if product[3] == 'Chains' %}selected{% endif %}>Chains</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="3">{{ product[4] }}</textarea>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>Pricing & Metal</h3>
+                
+                <div class="form-group">
+                    <label for="price_type">Price Type *</label>
+                    <select id="price_type" name="price_type" required onchange="togglePriceFields()">
+                        <option value="fixed" {% if product[5] == 'fixed' %}selected{% endif %}>Fixed Price</option>
+                        <option value="per_gram" {% if product[5] == 'per_gram' %}selected{% endif %}>Per Gram</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="metal_type_group">
+                    <label for="metal_type">Metal Type *</label>
+                    <select id="metal_type" name="metal_type" required onchange="updatePurityOptions()">
+                        <option value="gold" {% if product[8] == 'gold' %}selected{% endif %}>Gold</option>
+                        <option value="silver" {% if product[8] == 'silver' %}selected{% endif %}>Silver</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="purity">Purity *</label>
+                    <select id="purity" name="purity" required>
+                        <option value="22K" {% if product[9] == '22K' %}selected{% endif %}>22K</option>
+                        <option value="18K" {% if product[9] == '18K' %}selected{% endif %}>18K</option>
+                        <option value="14K" {% if product[9] == '14K' %}selected{% endif %}>14K</option>
+                        <option value="24K" {% if product[9] == '24K' %}selected{% endif %}>24K</option>
+                        <option value="Silver" {% if product[9] == 'Silver' %}selected{% endif %}>Silver</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="weight_group" {% if product[5] != 'per_gram' %}style="display: none;"{% endif %}>
+                    <label for="weight_in_grams">Weight (grams) *</label>
+                    <input type="number" id="weight_in_grams" name="weight_in_grams" step="0.001" min="0" value="{{ product[6] }}">
+                </div>
+                
+                <div class="form-group" id="price_group" {% if product[5] == 'per_gram' %}style="display: none;"{% endif %}>
+                    <label for="base_price">Price (₹) *</label>
+                    <input type="number" id="base_price" name="base_price" step="0.01" min="0" value="{{ product[7] }}" {% if product[5] == 'fixed' %}required{% endif %}>
+                </div>
+                
+                <div class="form-group">
+                    <label for="weight">Weight (grams) *</label>
+                    <input type="number" id="weight" name="weight" step="0.001" min="0" value="{{ product[11] }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="making_charges">Making Charges *</label>
+                    <input type="number" id="making_charges" name="making_charges" step="0.01" min="0" value="{{ product[12] }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="making_charges_type">Making Charges Type *</label>
+                    <select id="making_charges_type" name="making_charges_type" required>
+                        <option value="rupees" {% if product[13] == 'rupees' %}selected{% endif %}>Rupees (₹)</option>
+                        <option value="percent" {% if product[13] == 'percent' %}selected{% endif %}>Percentage (%)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>Product Image</h3>
+                
+                <div class="current-image">
+                    <label>Current Image:</label>
+                    <div class="image-preview">
+                        {% if product[10] %}
+                            <img src="{{ product[10] }}" alt="{{ product[1] }}">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/products/' + product[9]) }}" alt="{{ product[1] }}">
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="image">Change Image</label>
+                    <input type="file" id="image" name="image" accept="image/*">
+                    <small>Upload new image to replace current one (JPG, PNG)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="image_url">Image URL</label>
+                    <input type="url" id="image_url" name="image_url" value="{{ product[10] or '' }}" placeholder="https://example.com/image.jpg">
+                    <small>Or provide image URL</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="is_hidden" name="is_hidden" {% if product[13] %}checked{% endif %}>
+                        Hide Product
+                    </label>
+                    <small>Hidden products won't appear on website</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Update Product
+            </button>
+            <a href="{{ url_for('admin_products') }}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function togglePriceFields() {
+    const priceType = document.getElementById('price_type').value;
+    const weightGroup = document.getElementById('weight_group');
+    const priceGroup = document.getElementById('price_group');
+    const weightInput = document.getElementById('weight_in_grams');
+    const priceInput = document.getElementById('base_price');
+    
+    if (priceType === 'per_gram') {
+        weightGroup.style.display = 'block';
+        priceGroup.style.display = 'none';
+        weightInput.required = true;
+        priceInput.required = false;
+        if (priceInput.value == 0) priceInput.value = 0;
+    } else {
+        weightGroup.style.display = 'none';
+        priceGroup.style.display = 'block';
+        weightInput.required = false;
+        priceInput.required = true;
+        if (weightInput.value == 0) weightInput.value = 0;
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    togglePriceFields();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Shop - Samrat Jewellers{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Our Collection</h1>
+        <p>Discover our exquisite range of jewelry</p>
+    </div>
+</section>
+
+<section class="shop-filters">
+    <div class="container">
+        <form method="GET" action="{{ url_for('shop') }}" class="search-form">
+            <div class="search-bar">
+                <input type="text" name="search" id="searchInput" placeholder="Search by name, SKU, category..." value="{{ current_search or '' }}">
+                <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <select name="category" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category.name }}" {% if current_category == category.name %}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <select name="metal" onchange="this.form.submit()">
+                        <option value="">All Metals</option>
+                        <option value="gold" {% if current_metal == 'gold' %}selected{% endif %}>Gold</option>
+                        <option value="silver" {% if current_metal == 'silver' %}selected{% endif %}>Silver</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <select name="price" onchange="this.form.submit()">
+                        <option value="">All Prices</option>
+                        <option value="0-10000" {% if current_price == '0-10000' %}selected{% endif %}>Under ₹10,000</option>
+                        <option value="10000-50000" {% if current_price == '10000-50000' %}selected{% endif %}>₹10,000 - ₹50,000</option>
+                        <option value="50000-999999" {% if current_price == '50000-999999' %}selected{% endif %}>Above ₹50,000</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <select name="sort" onchange="this.form.submit()">
+                        <option value="">Sort by</option>
+                        <option value="name" {% if request.args.get('sort') == 'name' %}selected{% endif %}>Name A-Z</option>
+                        <option value="price-low" {% if request.args.get('sort') == 'price-low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price-high" {% if request.args.get('sort') == 'price-high' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="category" {% if request.args.get('sort') == 'category' %}selected{% endif %}>Category</option>
+                    </select>
+                </div>
+                <button type="button" onclick="clearFilters()" class="clear-btn">Clear</button>
+            </div>
+        </form>
+        <div class="results-info">
+            <span id="resultsCount">{{ products|length }} products found</span>
+        </div>
+    </div>
+</section>
+
+<section class="products-section">
+    <div class="container">
+        {% if products %}
+        <div class="products-grid">
+            {% for product in products %}
+            <a href="{{ url_for('product_detail', product_id=product.id) }}" class="product-card-link">
+            <div class="product-card">
+                <div class="product-image">
+                    {% if product.image_url %}
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}" onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=\'image-placeholder\'><i class=\'fas fa-image\'></i><span>No Image</span></div>';">
+                    {% elif product.image and product.image != 'default.jpg' %}
+                        <img src="{{ url_for('static', filename='images/products/' + product.image) }}" alt="{{ product.name }}" onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=\'image-placeholder\'><i class=\'fas fa-image\'></i><span>No Image</span></div>';">
+                    {% else %}
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>No Image</span>
+                        </div>
+                    {% endif %}
+                    <div class="product-badge">
+                        {% if product.price_type == 'per_gram' %}
+                            <span class="badge-metal">{{ product.metal_type|title }}</span>
+                        {% else %}
+                            <span class="badge-fixed">Fixed Price</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3>{{ product.name }}</h3>
+                    <div class="product-details">
+                        <p class="product-category">{{ product.category }}</p>
+                        {% if product.price_type == 'per_gram' %}
+                            <p class="product-metal">{{ product.purity }} {{ product.metal_type|title }} • {{ product.weight_in_grams }}g</p>
+                        {% else %}
+                            <p class="product-metal">{{ product.purity }} {{ product.metal_type|title }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="product-pricing">
+                        <p class="product-price">₹{{ "%.0f"|format(product.calculated_price) }}</p>
+                    </div>
+                </div>
+            </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-products">
+            <div class="no-products-content">
+                <i class="fas fa-search"></i>
+                <h3>No products found</h3>
+                <p>Try browsing other categories or check back later.</p>
+                <a href="{{ url_for('shop') }}" class="btn btn-primary">View All Products</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+function clearFilters() {
+    window.location.href = '{{ url_for("shop") }}';
+}
+
+// Auto-submit search on Enter
+document.getElementById('searchInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        this.form.submit();
+    }
+});
+
+// Highlight search terms
+function highlightSearchTerms() {
+    const searchTerm = '{{ current_search or "" }}';
+    if (searchTerm) {
+        const products = document.querySelectorAll('.product-card h3');
+        products.forEach(title => {
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            title.innerHTML = title.textContent.replace(regex, '<mark>$1</mark>');
+        });
+    }
+}
+
+
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', highlightSearchTerms);
+</script>
+{% endblock %}

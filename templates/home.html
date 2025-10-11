@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="metal-rates">
+    <div class="container">
+        <div class="rates-grid">
+            {% if rates.gold %}
+            <div class="rate-card">
+                <div class="rate-icon">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div class="rate-info">
+                    <h3>Gold</h3>
+                    <p class="rate-price">₹{{ "%.2f"|format(rates.gold.rate_per_gram) }}/gram</p>
+                    <p class="rate-time">
+                        {% set time_diff = 30 %}
+                        {% if time_diff < 30 %}
+                            <span class="rate-fresh">Updated {{ "%.0f"|format(time_diff) }} min ago</span>
+                        {% elif time_diff < 120 %}
+                            <span class="rate-moderate">Updated {{ "%.0f"|format(time_diff) }} min ago</span>
+                        {% else %}
+                            <span class="rate-old">Updated {{ "%.0f"|format(time_diff/60) }} hrs ago</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if rates.silver %}
+            <div class="rate-card">
+                <div class="rate-icon">
+                    <i class="fas fa-medal"></i>
+                </div>
+                <div class="rate-info">
+                    <h3>Silver</h3>
+                    <p class="rate-price">₹{{ "%.2f"|format(rates.silver.rate_per_gram) }}/gram</p>
+                    <p class="rate-time">
+                        {% set time_diff = 45 %}
+                        {% if time_diff < 30 %}
+                            <span class="rate-fresh">Updated {{ "%.0f"|format(time_diff) }} min ago</span>
+                        {% elif time_diff < 120 %}
+                            <span class="rate-moderate">Updated {{ "%.0f"|format(time_diff) }} min ago</span>
+                        {% else %}
+                            <span class="rate-old">Updated {{ "%.0f"|format(time_diff/60) }} hrs ago</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="categories">
+    <div class="container">
+        <h2>Shop by Category</h2>
+        <div class="categories-grid">
+            {% if categories %}
+                {% for category in categories %}
+                <a href="{{ url_for('shop', category=category.name) }}" class="category-card">
+                    <div class="category-image">
+                        {% if category.image_url %}
+                            <img src="{{ category.image_url }}" alt="{{ category.name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                            <div class="category-placeholder" style="display:none">
+                                <i class="fas fa-gem"></i>
+                            </div>
+                        {% else %}
+                            <div class="category-placeholder">
+                                <i class="fas fa-gem"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="category-overlay">
+                        <h3>{{ category.name }}</h3>
+                    </div>
+                </a>
+                {% endfor %}
+            {% else %}
+                <a href="{{ url_for('shop', category='Necklaces') }}" class="category-card">
+                    <div class="category-image">
+                        <div class="category-placeholder">
+                            <i class="fas fa-gem"></i>
+                        </div>
+                    </div>
+                    <div class="category-overlay">
+                        <h3>Necklaces</h3>
+                        <p>Explore Collection</p>
+                    </div>
+                </a>
+                <a href="{{ url_for('shop', category='Rings') }}" class="category-card">
+                    <div class="category-image">
+                        <div class="category-placeholder">
+                            <i class="fas fa-ring"></i>
+                        </div>
+                    </div>
+                    <div class="category-overlay">
+                        <h3>Rings</h3>
+                        <p>Explore Collection</p>
+                    </div>
+                </a>
+                <a href="{{ url_for('shop', category='Earrings') }}" class="category-card">
+                    <div class="category-image">
+                        <div class="category-placeholder">
+                            <i class="fas fa-circle"></i>
+                        </div>
+                    </div>
+                    <div class="category-overlay">
+                        <h3>Earrings</h3>
+                        <p>Explore Collection</p>
+                    </div>
+                </a>
+                <a href="{{ url_for('shop', category='Chains') }}" class="category-card">
+                    <div class="category-image">
+                        <div class="category-placeholder">
+                            <i class="fas fa-link"></i>
+                        </div>
+                    </div>
+                    <div class="category-overlay">
+                        <h3>Chains</h3>
+                        <p>Explore Collection</p>
+                    </div>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="featured-products">
+    <div class="container">
+        <h2>New Products</h2>
+        <div class="products-grid">
+            {% for product in products %}
+            <a href="{{ url_for('product_detail', product_id=product.id) }}" class="product-card-link">
+            <div class="product-card">
+                <div class="product-image">
+                    {% if product.image_url %}
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                        <div class="image-placeholder" style="display:none"><i class="fas fa-image"></i><span>No Image</span></div>
+                    {% elif product.image and product.image != 'default.jpg' %}
+                        <img src="{{ url_for('static', filename='images/products/' + product.image) }}" alt="{{ product.name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                        <div class="image-placeholder" style="display:none"><i class="fas fa-image"></i><span>No Image</span></div>
+                    {% else %}
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>No Image</span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="product-info">
+                    <h3>{{ product.name }}</h3>
+                    <div class="product-details">
+                        <p class="product-category">{{ product.category }}</p>
+                        {% if product.price_type == 'per_gram' %}
+                            <p class="product-metal">{{ product.purity }} {{ product.metal_type|title }} • {{ product.weight_in_grams }}g</p>
+                        {% else %}
+                            <p class="product-metal">{{ product.purity }} {{ product.metal_type|title }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="product-pricing">
+                        <p class="product-price">₹{{ "%.0f"|format(product.calculated_price) }}</p>
+                    </div>
+                </div>
+            </div>
+            </a>
+            {% endfor %}
+        </div>
+        <div class="text-center">
+            <a href="{{ url_for('shop') }}" class="btn btn-outline">View All Products</a>
+        </div>
+    </div>
+</section>
+
+<script>
+function searchProducts() {
+    const searchTerm = document.getElementById('homeSearchInput').value.toLowerCase();
+    if (searchTerm.length > 0) {
+        window.location.href = `/shop?search=${encodeURIComponent(searchTerm)}`;
+    }
+}
+
+document.getElementById('homeSearchInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        searchProducts();
+    }
+});
+</script>
+{% endblock %}

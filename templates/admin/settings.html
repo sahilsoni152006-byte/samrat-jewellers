@@ -1,0 +1,187 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Settings{% endblock %}
+
+{% block content %}
+<div class="settings-section">
+    <div class="settings-grid">
+        <div class="settings-card">
+            <div class="card-header">
+                <h3><i class="fab fa-whatsapp"></i> WhatsApp Configuration</h3>
+                <p>Configure WhatsApp integration for customer inquiries</p>
+            </div>
+            
+            <form method="POST" action="{{ url_for('admin_update_settings') }}" class="settings-form">
+                <div class="form-group">
+                    <label for="whatsapp_number">WhatsApp Number</label>
+                    <input type="tel" id="whatsapp_number" name="whatsapp_number" 
+                           value="{{ settings.whatsapp_number or '919999999999' }}" 
+                           placeholder="919999999999" required>
+                    <small>Enter the WhatsApp number with country code (without + sign)</small>
+                </div>
+                
+                <div class="whatsapp-preview">
+                    <h4>Preview</h4>
+                    <div class="preview-content">
+                        <p><strong>Current WhatsApp Link Format:</strong></p>
+                        <code>https://api.whatsapp.com/send?phone={{ settings.whatsapp_number or '919999999999' }}&text=...</code>
+                        
+                        <p><strong>Test Link:</strong></p>
+                        <a href="https://api.whatsapp.com/send?phone={{ settings.whatsapp_number or '919999999999' }}&text=Hello! This is a test message from Samrat Jewellers admin panel." 
+                           target="_blank" class="btn btn-whatsapp btn-sm">
+                            <i class="fab fa-whatsapp"></i> Test WhatsApp Link
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save WhatsApp Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="settings-card">
+            <div class="card-header">
+                <h3><i class="fas fa-cog"></i> System Information</h3>
+                <p>Current system configuration and status</p>
+            </div>
+            
+            <div class="system-info">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Application Version</div>
+                        <div class="info-value">1.0.0</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Database Status</div>
+                        <div class="info-value">
+                            <span class="status-badge status-success">Connected</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Metal Rates API</div>
+                        <div class="info-value">
+                            <span class="status-badge status-warning">Manual Only</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">WhatsApp Integration</div>
+                        <div class="info-value">
+                            <span class="status-badge status-success">Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="settings-card">
+            <div class="card-header">
+                <h3><i class="fas fa-info-circle"></i> Integration Guide</h3>
+                <p>How to integrate with external services</p>
+            </div>
+            
+            <div class="integration-guide">
+                <div class="guide-section">
+                    <h4>Metal Rates API Integration</h4>
+                    <p>To integrate with a live metal rates API:</p>
+                    <ol>
+                        <li>Choose a metal rates API provider (e.g., metals-api.com, goldapi.io)</li>
+                        <li>Sign up and get your API key</li>
+                        <li>Update the <code>update_metal_rates_api()</code> function in <code>app.py</code></li>
+                        <li>Replace the sample API call with your actual endpoint</li>
+                        <li>Set up automatic updates using cron jobs or task scheduler</li>
+                    </ol>
+                </div>
+                
+                <div class="guide-section">
+                    <h4>WhatsApp Business API</h4>
+                    <p>For advanced WhatsApp integration:</p>
+                    <ol>
+                        <li>Apply for WhatsApp Business API access</li>
+                        <li>Get your Business Account ID and Access Token</li>
+                        <li>Update the WhatsApp integration code to use Business API</li>
+                        <li>Enable features like message templates and automated responses</li>
+                    </ol>
+                </div>
+                
+                <div class="guide-section">
+                    <h4>Payment Gateway Integration</h4>
+                    <p>To add payment processing (if needed in future):</p>
+                    <ol>
+                        <li>Choose a payment gateway (Razorpay, PayU, etc.)</li>
+                        <li>Get API credentials</li>
+                        <li>Implement payment forms and processing</li>
+                        <li>Add order management system</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        
+        <div class="settings-card">
+            <div class="card-header">
+                <h3><i class="fas fa-download"></i> Data Export</h3>
+                <p>Export all system data for backup or analysis</p>
+            </div>
+            
+            <div class="export-options">
+                <div class="export-item">
+                    <div class="export-info">
+                        <h4>Complete Data Export</h4>
+                        <p>Export all users, products, categories, and rates in one file</p>
+                    </div>
+                    <button onclick="exportAllData()" class="btn btn-primary">
+                        <i class="fas fa-database"></i> Export All Data
+                    </button>
+                </div>
+                
+                <div class="export-grid">
+                    <button onclick="exportUsers()" class="btn btn-outline">
+                        <i class="fas fa-users"></i> Export Users
+                    </button>
+                    <button onclick="exportProducts()" class="btn btn-outline">
+                        <i class="fas fa-box"></i> Export Products
+                    </button>
+                    <button onclick="exportCategories()" class="btn btn-outline">
+                        <i class="fas fa-tags"></i> Export Categories
+                    </button>
+                    <button onclick="exportRates()" class="btn btn-outline">
+                        <i class="fas fa-chart-line"></i> Export Rates
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function exportAllData() {
+    fetch('/admin/export/all')
+    .then(response => response.blob())
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'samrat_jewellers_complete_data.xlsx';
+        a.click();
+    });
+}
+
+function exportUsers() {
+    window.location.href = '/admin/export/users';
+}
+
+function exportProducts() {
+    window.location.href = '/admin/export/products';
+}
+
+function exportCategories() {
+    window.location.href = '/admin/export/categories';
+}
+
+function exportRates() {
+    window.location.href = '/admin/export/rates';
+}
+</script>
+{% endblock %}

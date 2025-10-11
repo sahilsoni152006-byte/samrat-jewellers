@@ -1,0 +1,106 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="dashboard-stats">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-box"></i>
+        </div>
+        <div class="stat-info">
+            <h3>{{ product_count }}</h3>
+            <p>Total Products</p>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-coins"></i>
+        </div>
+        <div class="stat-info">
+            <h3>₹{{ "%.0f"|format(rates.gold.rate_per_gram if rates.gold else 0) }}</h3>
+            <p>Gold Rate/gram</p>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-medal"></i>
+        </div>
+        <div class="stat-info">
+            <h3>₹{{ "%.0f"|format(rates.silver.rate_per_gram if rates.silver else 0) }}</h3>
+            <p>Silver Rate/gram</p>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h2>Recent Products</h2>
+            <a href="{{ url_for('admin_products') }}" class="btn btn-outline btn-sm">All</a>
+        </div>
+        {% if recent_products %}
+        <div class="compact-list">
+            {% for product in recent_products[:3] %}
+            <div class="list-item">
+                <div class="item-info">
+                    <strong>{{ product.name[:20] }}...</strong>
+                    <small>{{ product.category }}</small>
+                </div>
+                <div class="item-status">
+                    {% if product.is_hidden %}
+                        <span class="badge badge-danger">Hidden</span>
+                    {% else %}
+                        <span class="badge badge-success">Live</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-box"></i>
+            <p>No products</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h2>Metal Rates</h2>
+            <a href="{{ url_for('admin_rates') }}" class="btn btn-outline btn-sm">Edit</a>
+        </div>
+        <div class="compact-rates">
+            {% if rates.gold %}
+            <div class="rate-item">
+                <i class="fas fa-coins"></i>
+                <span>Gold: ₹{{ "%.0f"|format(rates.gold.rate_per_gram) }}/g</span>
+            </div>
+            {% endif %}
+            {% if rates.silver %}
+            <div class="rate-item">
+                <i class="fas fa-medal"></i>
+                <span>Silver: ₹{{ "%.0f"|format(rates.silver.rate_per_gram) }}/g</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="quick-actions">
+    <div class="actions-grid">
+        <a href="{{ url_for('admin_add_product') }}" class="action-card">
+            <i class="fas fa-plus"></i>
+            <span>Add Product</span>
+        </a>
+        <a href="{{ url_for('admin_rates') }}" class="action-card">
+            <i class="fas fa-chart-line"></i>
+            <span>Rates</span>
+        </a>
+        <a href="{{ url_for('admin_settings') }}" class="action-card">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

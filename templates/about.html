@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}About Us - Samrat Jewellers{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>About Samrat Jewellers</h1>
+        <p>Purity, Elegance, Trust - Our Legacy Since Generations</p>
+    </div>
+</section>
+
+<section class="about-content">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-text">
+                <h2>Our Story</h2>
+                <p>For over three generations, Samrat Jewellers has been synonymous with exquisite craftsmanship, uncompromising quality, and timeless elegance. Founded with a vision to create jewelry that celebrates life's precious moments, we have built our reputation on trust, authenticity, and exceptional service.</p>
+                
+                <p>Our journey began with a simple belief: every piece of jewelry should tell a story. Whether it's a wedding ring that symbolizes eternal love, a necklace that marks a milestone, or earrings that add sparkle to everyday moments, we craft each piece with passion and precision.</p>
+                
+                <h3>Our Values</h3>
+                <div class="values-grid">
+                    <div class="value-item">
+                        <div class="value-icon">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <h4>Purity</h4>
+                        <p>We guarantee the highest quality gold and silver, certified for purity and authenticity.</p>
+                    </div>
+                    <div class="value-item">
+                        <div class="value-icon">
+                            <i class="fas fa-gem"></i>
+                        </div>
+                        <h4>Elegance</h4>
+                        <p>Our designs blend traditional craftsmanship with contemporary aesthetics.</p>
+                    </div>
+                    <div class="value-item">
+                        <div class="value-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h4>Trust</h4>
+                        <p>Built on generations of honest business practices and customer satisfaction.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="about-image">
+                <div class="image-card">
+                    <i class="fas fa-store"></i>
+                    <h3>Visit Our Store</h3>
+                    <p>Experience our collection in person at our flagship store in Bhiwani.</p>
+                    <a href="https://maps.app.goo.gl/opLpEkkfZwyhVjd67" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-map-marked-alt"></i> Get Directions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features-section">
+    <div class="container">
+        <h2>Why Choose Samrat Jewellers?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Certified Quality</h3>
+                <p>All our jewelry comes with proper hallmarking and certification for guaranteed purity.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <h3>Expert Craftsmanship</h3>
+                <p>Our skilled artisans bring decades of experience to create masterpieces.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Live Metal Rates</h3>
+                <p>Transparent pricing based on current market rates updated in real-time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+                <h3>Easy Inquiry</h3>
+                <p>Connect with us instantly via WhatsApp for quick responses and personalized service.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Ready to Find Your Perfect Piece?</h2>
+            <p>Explore our collection and discover jewelry that speaks to your heart.</p>
+            <a href="{{ url_for('shop') }}" class="btn btn-primary">Browse Collection</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

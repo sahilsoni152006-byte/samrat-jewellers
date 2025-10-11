@@ -1,0 +1,67 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Users{% endblock %}
+
+{% block content %}
+<div class="page-actions">
+    <button onclick="exportUsers()" class="btn btn-secondary">
+        <i class="fas fa-download"></i> Export Excel
+    </button>
+</div>
+
+<div class="products-section">
+    {% if users %}
+    <div class="table-container">
+        <table class="data-table" id="usersTable">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Mobile</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user_id, user in users.items() %}
+                <tr>
+                    <td>
+                        <div class="product-name">
+                            <strong>{{ user.name }}</strong>
+                            <small>ID: {{ user_id[:8] }}...</small>
+                        </div>
+                    </td>
+                    <td>+91 {{ user.mobile }}</td>
+                    <td>{{ user.registered_date }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="tel:+91{{ user.mobile }}" class="btn btn-sm btn-primary" title="Call">
+                                <i class="fas fa-phone"></i>
+                            </a>
+                            <a href="https://api.whatsapp.com/send?phone=91{{ user.mobile }}&text=Hello {{ user.name }}, thank you for choosing Samrat Jewellers!" class="btn btn-sm btn-success" target="_blank" title="WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-users"></i>
+        <h3>No Customers Yet</h3>
+        <p>Customer registrations will appear here when users sign up on your website.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function exportUsers() {
+    const table = document.getElementById('usersTable');
+    const wb = XLSX.utils.table_to_book(table, {sheet: "Users"});
+    XLSX.writeFile(wb, 'samrat_jewellers_users.xlsx');
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+{% endblock %}

@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - Samrat Jewellers{% endblock %}
+
+{% block content %}
+<section class="product-detail">
+    <div class="container">
+        <div class="product-breadcrumb">
+            <button onclick="history.back()" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
+        
+        <div class="product-detail-grid">
+            <div class="product-image-section">
+                <div class="product-main-image" {% if product.image_url or (product.image and product.image != 'default.jpg') %}onclick="openFullscreen('{% if product.image_url %}{{ product.image_url }}{% else %}{{ url_for('static', filename='images/products/' + product.image) }}{% endif %}')"{% endif %}>
+                    {% if product.image_url %}
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}" onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=\'image-placeholder\'><i class=\'fas fa-image\'></i><span>No Image Available</span></div>';">
+                        <div class="fullscreen-icon"><i class="fas fa-expand"></i></div>
+                    {% elif product.image and product.image != 'default.jpg' %}
+                        <img src="{{ url_for('static', filename='images/products/' + product.image) }}" alt="{{ product.name }}" onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=\'image-placeholder\'><i class=\'fas fa-image\'></i><span>No Image Available</span></div>';">
+                        <div class="fullscreen-icon"><i class="fas fa-expand"></i></div>
+                    {% else %}
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>No Image Available</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="product-info-section">
+                
+                <h1 class="product-title">{{ product.name }}</h1>
+                <p class="product-sku">SKU: {{ product.sku }}</p>
+                
+                <div class="product-price-section">
+                    <div class="price-main">
+                        <span class="current-price">₹{{ "%.0f"|format(product.calculated_price) }}</span>
+                    </div>
+                </div>
+                
+
+                
+                <div class="product-highlights">
+                    <div class="highlight-item">
+                        <span class="highlight-label">Purity</span>
+                        <span class="highlight-value">{{ product.purity }}</span>
+                    </div>
+                    {% if product.price_type == 'per_gram' %}
+                    <div class="highlight-item">
+                        <span class="highlight-label">Weight</span>
+                        <span class="highlight-value">{{ product.weight_in_grams }}g</span>
+                    </div>
+                    {% endif %}
+                    <div class="highlight-item">
+                        <span class="highlight-label">Making Charges</span>
+                        <span class="highlight-value">
+                            {% if product.making_charges_type == 'percent' %}
+                                {{ product.making_charges }}%
+                            {% else %}
+                                ₹{{ product.making_charges }}
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="product-actions">
+                    <button class="btn btn-whatsapp btn-large" onclick="buyViaWhatsApp()">
+                        <i class="fab fa-whatsapp"></i> Buy via WhatsApp
+                    </button>
+                    <div class="secondary-actions">
+                        <button class="btn btn-outline" onclick="toggleWishlist()">
+                            <i class="far fa-heart"></i> Add to Wishlist
+                        </button>
+                        <button class="btn btn-secondary" onclick="shareProduct()">
+                            <i class="fas fa-share-alt"></i> Share
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="product-specifications">
+                    <h3>Specifications</h3>
+                    <div class="specs-grid">
+                        <div class="spec-item">
+                            <span class="spec-label">Category:</span>
+                            <span class="spec-value">{{ product.category }}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Metal Type:</span>
+                            <span class="spec-value">{{ product.metal_type|title }}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">SKU:</span>
+                            <span class="spec-value">{{ product.sku }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-description">
+                    <h3>Description</h3>
+                    <p>{{ product.description }}</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="fullscreenModal" class="fullscreen-modal" onclick="closeFullscreen()">
+    <img id="fullscreenImage" src="" alt="" onclick="event.stopPropagation()">
+    <div class="zoom-controls" onclick="event.stopPropagation()">
+        <button onclick="zoomIn()"><i class="fas fa-plus"></i></button>
+        <button onclick="zoomOut()"><i class="fas fa-minus"></i></button>
+    </div>
+    <span class="close-fullscreen">&times;</span>
+</div>
+
+<script>
+let currentZoom = 1;
+
+function openFullscreen(imageSrc) {
+    if (imageSrc && imageSrc !== '') {
+        currentZoom = 1;
+        const img = document.getElementById('fullscreenImage');
+        img.src = imageSrc;
+        img.style.transform = 'scale(1)';
+        document.getElementById('fullscreenModal').style.display = 'flex';
+    }
+}
+
+function closeFullscreen() {
+    document.getElementById('fullscreenModal').style.display = 'none';
+}
+
+function zoomIn() {
+    currentZoom = Math.min(currentZoom + 0.2, 3);
+    document.getElementById('fullscreenImage').style.transform = `scale(${currentZoom})`;
+}
+
+function zoomOut() {
+    currentZoom = Math.max(currentZoom - 0.2, 0.5);
+    document.getElementById('fullscreenImage').style.transform = `scale(${currentZoom})`;
+}
+
+function toggleWishlist() {
+    const productId = '{{ product.id }}';
+    const btn = event.target.closest('button');
+    const icon = btn.querySelector('i');
+    const isInWishlist = icon.classList.contains('fas');
+    
+    const action = isInWishlist ? 'remove' : 'add';
+    
+    fetch(`/wishlist/${action}/${productId}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (isInWishlist) {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                btn.innerHTML = '<i class="far fa-heart"></i> Add to Wishlist';
+            } else {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                btn.innerHTML = '<i class="fas fa-heart"></i> In Wishlist';
+            }
+        } else {
+            alert(data.message || 'Please login to use wishlist');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating wishlist');
+    });
+}
+
+// Check wishlist status on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const productId = '{{ product.id }}';
+    
+    fetch(`/wishlist/check/${productId}`)
+    .then(response => response.json())
+    .then(data => {
+        const btn = document.querySelector('.product-actions button[onclick="toggleWishlist()"]');
+        const icon = btn.querySelector('i');
+        
+        if (data.in_wishlist) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            btn.innerHTML = '<i class="fas fa-heart"></i> In Wishlist';
+        } else {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            btn.innerHTML = '<i class="far fa-heart"></i> Add to Wishlist';
+        }
+    })
+    .catch(error => console.error('Error checking wishlist:', error));
+});
+
+function shareProduct() {
+    const productName = "{{ product.name }}";
+    const productPrice = "₹{{ "%.0f"|format(product.calculated_price) }}";
+    const productURL = window.location.href;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: productName + ' - Samrat Jewellers',
+            text: `Check out this beautiful ${productName} for ${productPrice} at Samrat Jewellers`,
+            url: productURL
+        });
+    } else {
+        // Fallback for browsers without Web Share API
+        const shareText = `Check out this beautiful ${productName} for ${productPrice} at Samrat Jewellers\n${productURL}`;
+        
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(shareText).then(() => {
+                alert('Product link copied to clipboard!');
+            });
+        } else {
+            // Show share options modal
+            showShareModal(productName, productPrice, productURL);
+        }
+    }
+}
+
+function showShareModal(name, price, url) {
+    const shareText = encodeURIComponent(`Check out this beautiful ${name} for ${price} at Samrat Jewellers ${url}`);
+    const shareOptions = [
+        { name: 'WhatsApp', url: `https://api.whatsapp.com/send?text=${shareText}`, icon: 'fab fa-whatsapp' },
+        { name: 'Facebook', url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, icon: 'fab fa-facebook' },
+        { name: 'Instagram', url: `https://www.instagram.com/`, icon: 'fab fa-instagram' },
+        { name: 'ARTTAI', url: `https://arttai.com/share?url=${encodeURIComponent(url)}&text=${shareText}`, icon: 'fas fa-palette' },
+        { name: 'Copy Link', action: 'copy', icon: 'fas fa-copy' }
+    ];
+    
+    let modal = `<div id="shareModal" class="share-modal" onclick="closeShareModal()">
+        <div class="share-content" onclick="event.stopPropagation()">
+            <h3>Share Product</h3>
+            <div class="share-options">`;
+    
+    shareOptions.forEach(option => {
+        if (option.action === 'copy') {
+            modal += `<button onclick="copyToClipboard('${url}')" class="share-option">
+                <i class="${option.icon}"></i> ${option.name}
+            </button>`;
+        } else {
+            modal += `<a href="${option.url}" target="_blank" class="share-option">
+                <i class="${option.icon}"></i> ${option.name}
+            </a>`;
+        }
+    });
+    
+    modal += `</div><button onclick="closeShareModal()" class="close-share">×</button></div></div>`;
+    document.body.insertAdjacentHTML('beforeend', modal);
+}
+
+function closeShareModal() {
+    const modal = document.getElementById('shareModal');
+    if (modal) modal.remove();
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Link copied to clipboard!');
+        closeShareModal();
+    });
+}
+
+function buyViaWhatsApp() {
+    const productName = "{{ product.name }}";
+    const productSKU = "{{ product.sku }}";
+    const productWeight = "{{ product.weight_in_grams }}";
+    const calculatedPrice = "{{ "%.2f"|format(product.calculated_price) }}";
+    const metalType = "{{ product.metal_type }}";
+    const currentRate = "{{ "%.2f"|format(rates[product.metal_type].rate_per_gram) if product.price_type == 'per_gram' else 'N/A' }}";
+    const whatsappNumber = "{{ whatsapp_number }}";
+    const timestamp = new Date().toLocaleString();
+    
+    let message = `Hello! I'm interested in the following product:\n\n`;
+    message += `Product: ${productName}\n`;
+    message += `SKU: ${productSKU}\n`;
+    {% if product.price_type == 'per_gram' %}
+    message += `Weight: ${productWeight}g\n`;
+    message += `Metal: ${metalType}\n`;
+    message += `Current ${metalType} rate: ₹${currentRate}/gram\n`;
+    {% endif %}
+    message += `Price: ₹${calculatedPrice}\n`;
+    message += `Inquiry time: ${timestamp}\n\n`;
+    message += `Please provide more details about availability and purchase process.`;
+    
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappURL = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
+    
+    window.open(whatsappURL, '_blank');
+}
+</script>
+{% endblock %}

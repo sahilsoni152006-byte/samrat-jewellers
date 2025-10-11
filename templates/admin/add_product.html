@@ -1,0 +1,194 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Add Product{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h2><i class="fas fa-plus"></i> Add New Product</h2>
+        <a href="{{ url_for('admin_products') }}" class="btn btn-outline">
+            <i class="fas fa-arrow-left"></i> Back to Products
+        </a>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="product-form">
+        <div class="form-grid">
+            <div class="form-section">
+                <h3>Basic Information</h3>
+                
+                <div class="form-group">
+                    <label for="name">Product Name *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sku">SKU *</label>
+                    <input type="text" id="sku" name="sku" required>
+                    <small>Unique product identifier</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">Category *</label>
+                    <select id="category" name="category" required>
+                        <option value="">Select Category</option>
+                        <option value="Necklaces">Necklaces</option>
+                        <option value="Earrings">Earrings</option>
+                        <option value="Rings">Rings</option>
+                        <option value="Bracelets">Bracelets</option>
+                        <option value="Pendants">Pendants</option>
+                        <option value="Chains">Chains</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="3"></textarea>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>Pricing & Metal</h3>
+                
+                <div class="form-group">
+                    <label for="price_type">Price Type *</label>
+                    <select id="price_type" name="price_type" required onchange="togglePriceFields()">
+                        <option value="fixed">Fixed Price</option>
+                        <option value="per_gram">Per Gram</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="metal_type_group">
+                    <label for="metal_type">Metal Type *</label>
+                    <select id="metal_type" name="metal_type" required onchange="updatePurityOptions()">
+                        <option value="gold">Gold</option>
+                        <option value="silver">Silver</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="purity">Purity *</label>
+                    <select id="purity" name="purity" required>
+                        <option value="22K">22K</option>
+                        <option value="18K">18K</option>
+                        <option value="14K">14K</option>
+                        <option value="24K">24K</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="weight">Weight (grams) *</label>
+                    <input type="number" id="weight" name="weight" step="0.001" min="0" required>
+                </div>
+                
+                <div class="form-group" id="price_group">
+                    <label for="base_price">Price (₹) *</label>
+                    <input type="number" id="base_price" name="base_price" step="0.01" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="making_charges">Making Charges *</label>
+                    <input type="number" id="making_charges" name="making_charges" step="0.01" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="making_charges_type">Making Charges Type *</label>
+                    <select id="making_charges_type" name="making_charges_type" required>
+                        <option value="rupees">Rupees (₹)</option>
+                        <option value="percent">Percentage (%)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>Product Image</h3>
+                
+                <div class="form-group">
+                    <label for="image">Upload Image</label>
+                    <input type="file" id="image" name="image" accept="image/*">
+                    <small>Upload from computer</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="image_url">Google Drive Image URL</label>
+                    <input type="url" id="image_url" name="image_url" placeholder="https://drive.google.com/..." onchange="previewGoogleDriveImage()">
+                    <small>Paste Google Drive share link (preferred)</small>
+                    <div id="image_preview" style="margin-top: 10px; display: none;">
+                        <img id="preview_img" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 1px solid #ddd;">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="is_hidden" name="is_hidden">
+                        Hide Product
+                    </label>
+                    <small>Hidden products won't appear on website</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Add Product
+            </button>
+            <a href="{{ url_for('admin_products') }}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function togglePriceFields() {
+    const priceType = document.getElementById('price_type').value;
+    const priceGroup = document.getElementById('price_group');
+    const priceInput = document.getElementById('base_price');
+    
+    if (priceType === 'per_gram') {
+        priceGroup.style.display = 'none';
+        priceInput.required = false;
+        priceInput.value = 0;
+    } else {
+        priceGroup.style.display = 'block';
+        priceInput.required = true;
+    }
+}
+
+function updatePurityOptions() {
+    const metalType = document.getElementById('metal_type').value;
+    const puritySelect = document.getElementById('purity');
+    
+    puritySelect.innerHTML = '';
+    
+    if (metalType === 'gold') {
+        puritySelect.innerHTML = `
+            <option value="22K">22K</option>
+            <option value="18K">18K</option>
+            <option value="14K">14K</option>
+            <option value="24K">24K</option>
+        `;
+    } else if (metalType === 'silver') {
+        puritySelect.innerHTML = `
+            <option value="Silver">Silver</option>
+        `;
+    }
+}
+
+function previewGoogleDriveImage() {
+    const url = document.getElementById('image_url').value;
+    const preview = document.getElementById('image_preview');
+    const img = document.getElementById('preview_img');
+    
+    if (url && url.includes('drive.google.com')) {
+        let convertedUrl = url;
+        if (url.includes('/file/d/')) {
+            const fileId = url.split('/file/d/')[1].split('/')[0];
+            convertedUrl = `https://lh3.googleusercontent.com/d/${fileId}`;
+        }
+        
+        img.src = convertedUrl;
+        preview.style.display = 'block';
+    } else {
+        preview.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

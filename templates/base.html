@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Samrat Jewellers - Purity, Elegance, Trust{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="{{ url_for('home') }}">
+                    <i class="fas fa-gem"></i>
+                    Samrat Jewellers
+                </a>
+            </div>
+            <div class="nav-menu" id="nav-menu">
+                <a href="{{ url_for('home') }}" class="nav-link">HOME</a>
+                <a href="{{ url_for('shop') }}" class="nav-link">SHOP</a>
+                <a href="{{ url_for('wishlist') }}" class="nav-link">WISHLIST</a>
+                <a href="{{ url_for('profile') }}" class="nav-link">PROFILE</a>
+                <a href="{{ url_for('contact') }}" class="nav-link">CONTACT</a>
+                <a href="{{ url_for('about') }}" class="nav-link">ABOUT</a>
+            </div>
+
+        </div>
+    </nav>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                            {{ message }}
+                            <button class="flash-close">&times;</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav">
+        <a href="{{ url_for('home') }}" class="nav-item {% if request.endpoint == 'home' %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="{{ url_for('shop') }}" class="nav-item {% if request.endpoint == 'shop' %}active{% endif %}">
+            <i class="fas fa-shopping-bag"></i>
+            <span>Shop</span>
+        </a>
+        <a href="{{ url_for('wishlist') }}" class="nav-item {% if request.endpoint == 'wishlist' %}active{% endif %}">
+            <i class="fas fa-heart"></i>
+            <span>Wishlist</span>
+        </a>
+        <a href="{{ url_for('profile') }}" class="nav-item {% if request.endpoint == 'profile' %}active{% endif %}">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
