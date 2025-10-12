@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samrat-jewellers-v1';
+const CACHE_NAME = 'samrat-jewellers-v2';
 const urlsToCache = [
   '/',
   '/static/css/style.css',
@@ -12,6 +12,7 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(urlsToCache))
   );
+  self.skipWaiting();
 });
 
 self.addEventListener('fetch', (event) => {
