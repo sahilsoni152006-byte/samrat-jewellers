@@ -71,7 +71,7 @@ def init_firebase():
     db.reference('metal_rates').set(rates_data)
     
     # Initialize settings
-    settings_data = {'whatsapp_number': '919999999999'}
+    settings_data = {'whatsapp_number': '919034772610'}
     db.reference('settings').set(settings_data)
     
     print("Firebase database initialized successfully!")
