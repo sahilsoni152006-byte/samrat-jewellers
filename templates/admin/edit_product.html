@@ -18,12 +18,12 @@
                 
                 <div class="form-group">
                     <label for="name">Product Name *</label>
-                    <input type="text" id="name" name="name" value="{{ product[1] }}" required>
+                    <input type="text" id="name" name="name" value="{{ product.name }}" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="sku">SKU *</label>
-                    <input type="text" id="sku" name="sku" value="{{ product[2] }}" required>
+                    <input type="text" id="sku" name="sku" value="{{ product.sku }}" required>
                     <small>Unique product identifier</small>
                 </div>
                 
@@ -31,18 +31,18 @@
                     <label for="category">Category *</label>
                     <select id="category" name="category" required>
                         <option value="">Select Category</option>
-                        <option value="Necklaces" {% if product[3] == 'Necklaces' %}selected{% endif %}>Necklaces</option>
-                        <option value="Earrings" {% if product[3] == 'Earrings' %}selected{% endif %}>Earrings</option>
-                        <option value="Rings" {% if product[3] == 'Rings' %}selected{% endif %}>Rings</option>
-                        <option value="Bracelets" {% if product[3] == 'Bracelets' %}selected{% endif %}>Bracelets</option>
-                        <option value="Pendants" {% if product[3] == 'Pendants' %}selected{% endif %}>Pendants</option>
-                        <option value="Chains" {% if product[3] == 'Chains' %}selected{% endif %}>Chains</option>
+                        <option value="Necklaces" {% if product.category == 'Necklaces' %}selected{% endif %}>Necklaces</option>
+                        <option value="Earrings" {% if product.category == 'Earrings' %}selected{% endif %}>Earrings</option>
+                        <option value="Rings" {% if product.category == 'Rings' %}selected{% endif %}>Rings</option>
+                        <option value="Bracelets" {% if product.category == 'Bracelets' %}selected{% endif %}>Bracelets</option>
+                        <option value="Pendants" {% if product.category == 'Pendants' %}selected{% endif %}>Pendants</option>
+                        <option value="Chains" {% if product.category == 'Chains' %}selected{% endif %}>Chains</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
                     <label for="description">Description</label>
-                    <textarea id="description" name="description" rows="3">{{ product[4] }}</textarea>
+                    <textarea id="description" name="description" rows="3">{{ product.description }}</textarea>
                 </div>
             </div>
             
@@ -52,55 +52,55 @@
                 <div class="form-group">
                     <label for="price_type">Price Type *</label>
                     <select id="price_type" name="price_type" required onchange="togglePriceFields()">
-                        <option value="fixed" {% if product[5] == 'fixed' %}selected{% endif %}>Fixed Price</option>
-                        <option value="per_gram" {% if product[5] == 'per_gram' %}selected{% endif %}>Per Gram</option>
+                        <option value="fixed" {% if product.price_type == 'fixed' %}selected{% endif %}>Fixed Price</option>
+                        <option value="per_gram" {% if product.price_type == 'per_gram' %}selected{% endif %}>Per Gram</option>
                     </select>
                 </div>
                 
                 <div class="form-group" id="metal_type_group">
                     <label for="metal_type">Metal Type *</label>
                     <select id="metal_type" name="metal_type" required onchange="updatePurityOptions()">
-                        <option value="gold" {% if product[8] == 'gold' %}selected{% endif %}>Gold</option>
-                        <option value="silver" {% if product[8] == 'silver' %}selected{% endif %}>Silver</option>
+                        <option value="gold" {% if product.metal_type == 'gold' %}selected{% endif %}>Gold</option>
+                        <option value="silver" {% if product.metal_type == 'silver' %}selected{% endif %}>Silver</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
                     <label for="purity">Purity *</label>
                     <select id="purity" name="purity" required>
-                        <option value="22K" {% if product[9] == '22K' %}selected{% endif %}>22K</option>
-                        <option value="18K" {% if product[9] == '18K' %}selected{% endif %}>18K</option>
-                        <option value="14K" {% if product[9] == '14K' %}selected{% endif %}>14K</option>
-                        <option value="24K" {% if product[9] == '24K' %}selected{% endif %}>24K</option>
-                        <option value="Silver" {% if product[9] == 'Silver' %}selected{% endif %}>Silver</option>
+                        <option value="22K" {% if product.purity == '22K' %}selected{% endif %}>22K</option>
+                        <option value="18K" {% if product.purity == '18K' %}selected{% endif %}>18K</option>
+                        <option value="14K" {% if product.purity == '14K' %}selected{% endif %}>14K</option>
+                        <option value="24K" {% if product.purity == '24K' %}selected{% endif %}>24K</option>
+                        <option value="Silver" {% if product.purity == 'Silver' %}selected{% endif %}>Silver</option>
                     </select>
                 </div>
                 
-                <div class="form-group" id="weight_group" {% if product[5] != 'per_gram' %}style="display: none;"{% endif %}>
+                <div class="form-group" id="weight_group" {% if product.price_type != 'per_gram' %}style="display: none;"{% endif %}>
                     <label for="weight_in_grams">Weight (grams) *</label>
-                    <input type="number" id="weight_in_grams" name="weight_in_grams" step="0.001" min="0" value="{{ product[6] }}">
+                    <input type="number" id="weight_in_grams" name="weight_in_grams" step="0.001" min="0" value="{{ product.weight_in_grams }}">
                 </div>
                 
-                <div class="form-group" id="price_group" {% if product[5] == 'per_gram' %}style="display: none;"{% endif %}>
+                <div class="form-group" id="price_group" {% if product.price_type == 'per_gram' %}style="display: none;"{% endif %}>
                     <label for="base_price">Price (₹) *</label>
-                    <input type="number" id="base_price" name="base_price" step="0.01" min="0" value="{{ product[7] }}" {% if product[5] == 'fixed' %}required{% endif %}>
+                    <input type="number" id="base_price" name="base_price" step="0.01" min="0" value="{{ product.base_price }}" {% if product.price_type == 'fixed' %}required{% endif %}>
                 </div>
                 
                 <div class="form-group">
                     <label for="weight">Weight (grams) *</label>
-                    <input type="number" id="weight" name="weight" step="0.001" min="0" value="{{ product[11] }}" required>
+                    <input type="number" id="weight" name="weight" step="0.001" min="0" value="{{ product.weight }}" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="making_charges">Making Charges *</label>
-                    <input type="number" id="making_charges" name="making_charges" step="0.01" min="0" value="{{ product[12] }}" required>
+                    <input type="number" id="making_charges" name="making_charges" step="0.01" min="0" value="{{ product.making_charges }}" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="making_charges_type">Making Charges Type *</label>
                     <select id="making_charges_type" name="making_charges_type" required>
-                        <option value="rupees" {% if product[13] == 'rupees' %}selected{% endif %}>Rupees (₹)</option>
-                        <option value="percent" {% if product[13] == 'percent' %}selected{% endif %}>Percentage (%)</option>
+                        <option value="rupees" {% if product.making_charges_type == 'rupees' %}selected{% endif %}>Rupees (₹)</option>
+                        <option value="percent" {% if product.making_charges_type == 'percent' %}selected{% endif %}>Percentage (%)</option>
                     </select>
                 </div>
             </div>
@@ -111,10 +111,12 @@
                 <div class="current-image">
                     <label>Current Image:</label>
                     <div class="image-preview">
-                        {% if product[10] %}
-                            <img src="{{ product[10] }}" alt="{{ product[1] }}">
+                        {% if product.image_url %}
+                            <img src="{{ product.image_url }}" alt="{{ product.name }}">
+                        {% elif product.image %}
+                            <img src="{{ url_for('static', filename='images/products/' + product.image) }}" alt="{{ product.name }}">
                         {% else %}
-                            <img src="{{ url_for('static', filename='images/products/' + product[9]) }}" alt="{{ product[1] }}">
+                            <img src="{{ url_for('static', filename='images/products/default.jpg') }}" alt="{{ product.name }}">
                         {% endif %}
                     </div>
                 </div>
@@ -127,13 +129,13 @@
                 
                 <div class="form-group">
                     <label for="image_url">Image URL</label>
-                    <input type="url" id="image_url" name="image_url" value="{{ product[10] or '' }}" placeholder="https://example.com/image.jpg">
+                    <input type="url" id="image_url" name="image_url" value="{{ product.image_url or '' }}" placeholder="https://example.com/image.jpg">
                     <small>Or provide image URL</small>
                 </div>
                 
                 <div class="form-group">
                     <label>
-                        <input type="checkbox" id="is_hidden" name="is_hidden" {% if product[13] %}checked{% endif %}>
+                        <input type="checkbox" id="is_hidden" name="is_hidden" {% if product.is_hidden %}checked{% endif %}>
                         Hide Product
                     </label>
                     <small>Hidden products won't appear on website</small>
