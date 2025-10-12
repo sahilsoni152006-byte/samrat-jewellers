@@ -447,6 +447,9 @@ def admin_products():
     products = []
     for key, product in all_products.items():
         product['id'] = key
+        # Convert Google Drive URLs
+        if product.get('image_url'):
+            product['image_url'] = convert_google_drive_url(product['image_url'])
         products.append(product)
     
     return render_template('admin/products.html', products=products)
@@ -514,7 +517,11 @@ def admin_edit_product(product_id):
     if not product:
         flash('Product not found!', 'error')
         return redirect(url_for('admin_products'))
-    
+        
+    # Convert Google Drive URL for display
+    if product.get('image_url'):
+        product['image_url'] = convert_google_drive_url(product['image_url'])
+        
     if request.method == 'POST':
         weight_value = float(request.form.get('weight', 0))
         product_data = {
