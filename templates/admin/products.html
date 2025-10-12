@@ -32,41 +32,47 @@
                 <tr>
                     <td>
                         <div class="product-image-thumb">
-                            <img src="{{ url_for('static', filename='images/products/' + product[10]) }}" alt="{{ product[1] }}">
+                            {% if product.image_url %}
+                                <img src="{{ product.image_url }}" alt="{{ product.name }}">
+                            {% elif product.image %}
+                                <img src="{{ url_for('static', filename='images/products/' + product.image) }}" alt="{{ product.name }}">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/products/default.jpg') }}" alt="{{ product.name }}">
+                            {% endif %}
                         </div>
                     </td>
                     <td>
                         <div class="product-name">
-                            <strong>{{ product[1] }}</strong>
-                            <small>{{ product[4][:50] if product[4] else '' }}...</small>
+                            <strong>{{ product.name }}</strong>
+                            <small>{{ product.description[:50] if product.description else '' }}...</small>
                         </div>
                     </td>
-                    <td>{{ product[2] }}</td>
-                    <td>{{ product[3] }}</td>
+                    <td>{{ product.sku }}</td>
+                    <td>{{ product.category }}</td>
                     <td>
-                        {% if product[5] == 'per_gram' %}
-                            <span class="badge badge-info">Per Gram ({{ product[8]|title }})</span>
+                        {% if product.price_type == 'per_gram' %}
+                            <span class="badge badge-info">Per Gram ({{ product.metal_type|title }})</span>
                         {% else %}
                             <span class="badge badge-secondary">Fixed Price</span>
                         {% endif %}
                     </td>
-                    <td>{{ product[9] }}</td>
+                    <td>{{ product.purity }}</td>
                     <td>
-                        {% if product[5] == 'per_gram' %}
-                            {{ product[12] }}g
+                        {% if product.price_type == 'per_gram' %}
+                            {{ product.weight_in_grams }}g
                         {% else %}
-                            ₹{{ "%.2f"|format(product[7]) }}
+                            ₹{{ "%.2f"|format(product.base_price) }}
                         {% endif %}
                     </td>
                     <td>
-                        {% if product[14] == 'percent' %}
-                            {{ product[13] }}%
+                        {% if product.making_charges_type == 'percent' %}
+                            {{ product.making_charges }}%
                         {% else %}
-                            ₹{{ "%.2f"|format(product[13]) }}
+                            ₹{{ "%.2f"|format(product.making_charges) }}
                         {% endif %}
                     </td>
                     <td>
-                        {% if product[15] == 1 %}
+                        {% if product.is_hidden %}
                             <span class="badge badge-danger">Hidden</span>
                         {% else %}
                             <span class="badge badge-success">Visible</span>
@@ -74,13 +80,13 @@
                     </td>
                     <td>
                         <div class="action-buttons">
-                            <a href="{{ url_for('product_detail', product_id=product[0]) }}" class="btn btn-sm btn-outline" target="_blank" title="View">
+                            <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn btn-sm btn-outline" target="_blank" title="View">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a href="{{ url_for('admin_edit_product', product_id=product[0]) }}" class="btn btn-sm btn-secondary" title="Edit">
+                            <a href="{{ url_for('admin_edit_product', product_id=product.id) }}" class="btn btn-sm btn-secondary" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a href="{{ url_for('admin_delete_product', product_id=product[0]) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this product?')" title="Delete">
+                            <a href="{{ url_for('admin_delete_product', product_id=product.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this product?')" title="Delete">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
