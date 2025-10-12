@@ -31,12 +31,9 @@
                     <label for="category">Category *</label>
                     <select id="category" name="category" required>
                         <option value="">Select Category</option>
-                        <option value="Necklaces" {% if product.category == 'Necklaces' %}selected{% endif %}>Necklaces</option>
-                        <option value="Earrings" {% if product.category == 'Earrings' %}selected{% endif %}>Earrings</option>
-                        <option value="Rings" {% if product.category == 'Rings' %}selected{% endif %}>Rings</option>
-                        <option value="Bracelets" {% if product.category == 'Bracelets' %}selected{% endif %}>Bracelets</option>
-                        <option value="Pendants" {% if product.category == 'Pendants' %}selected{% endif %}>Pendants</option>
-                        <option value="Chains" {% if product.category == 'Chains' %}selected{% endif %}>Chains</option>
+                        {% for category in categories %}
+                        <option value="{{ category.name }}" {% if product.category == category.name %}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 
@@ -76,9 +73,9 @@
                     </select>
                 </div>
                 
-                <div class="form-group" id="weight_group" {% if product.price_type != 'per_gram' %}style="display: none;"{% endif %}>
-                    <label for="weight_in_grams">Weight (grams) *</label>
-                    <input type="number" id="weight_in_grams" name="weight_in_grams" step="0.001" min="0" value="{{ product.weight_in_grams }}">
+                <div class="form-group">
+                    <label for="weight">Weight (grams) *</label>
+                    <input type="number" id="weight" name="weight" step="0.001" min="0" value="{{ product.weight or product.weight_in_grams }}" required>
                 </div>
                 
                 <div class="form-group" id="price_group" {% if product.price_type == 'per_gram' %}style="display: none;"{% endif %}>
@@ -86,10 +83,6 @@
                     <input type="number" id="base_price" name="base_price" step="0.01" min="0" value="{{ product.base_price }}" {% if product.price_type == 'fixed' %}required{% endif %}>
                 </div>
                 
-                <div class="form-group">
-                    <label for="weight">Weight (grams) *</label>
-                    <input type="number" id="weight" name="weight" step="0.001" min="0" value="{{ product.weight }}" required>
-                </div>
                 
                 <div class="form-group">
                     <label for="making_charges">Making Charges *</label>
@@ -160,23 +153,16 @@
 <script>
 function togglePriceFields() {
     const priceType = document.getElementById('price_type').value;
-    const weightGroup = document.getElementById('weight_group');
     const priceGroup = document.getElementById('price_group');
-    const weightInput = document.getElementById('weight_in_grams');
     const priceInput = document.getElementById('base_price');
     
     if (priceType === 'per_gram') {
-        weightGroup.style.display = 'block';
         priceGroup.style.display = 'none';
-        weightInput.required = true;
         priceInput.required = false;
-        if (priceInput.value == 0) priceInput.value = 0;
+        priceInput.value = 0;
     } else {
-        weightGroup.style.display = 'none';
         priceGroup.style.display = 'block';
-        weightInput.required = false;
         priceInput.required = true;
-        if (weightInput.value == 0) weightInput.value = 0;
     }
 }
 
