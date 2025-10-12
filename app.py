@@ -449,7 +449,7 @@ def admin_products():
         product['id'] = key
         products.append(product)
     
-    return render_template('admin/products_firebase.html', products=products)
+    return render_template('admin/products.html', products=products)
 
 @app.route('/admin/products/add', methods=['GET', 'POST'])
 def admin_add_product():
@@ -551,7 +551,7 @@ def admin_edit_product(product_id):
         return redirect(url_for('admin_products'))
     
     product['id'] = product_id
-    return render_template('admin/edit_product_firebase.html', product=product)
+    return render_template('admin/edit_product.html', product=product)
 
 @app.route('/admin/products/delete/<product_id>')
 def admin_delete_product(product_id):
