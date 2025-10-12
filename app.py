@@ -61,7 +61,7 @@ def init_firebase():
         'password_hash': admin_hash,
         'role': 'admin'
     }
-    db.reference('users').child('samrat_admin').set(admin_data)
+    db.reference('users').child('admin').set(admin_data)
     
     # Initialize metal rates
     rates_data = {
