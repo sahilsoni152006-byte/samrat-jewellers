@@ -115,6 +115,38 @@ body {
     width: 100%;
 }
 
+/* Install Button */
+.install-btn {
+    background: linear-gradient(135deg, var(--primary-color), #0056b3);
+    color: var(--white);
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+}
+
+.install-btn:hover {
+    background: linear-gradient(135deg, #0056b3, var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
+}
+
+.install-btn i {
+    font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+    .install-btn {
+        display: none;
+    }
+}
 
 
 /* Container */
