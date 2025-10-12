@@ -1,6 +1,31 @@
 // Main JavaScript for Samrat Jewellers
 
 document.addEventListener('DOMContentLoaded', function() {
+        // PWA Install functionality
+    let deferredPrompt;
+    const installBtn = document.getElementById('install-btn');
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.style.display = 'flex';
+    });
+    
+    installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installBtn.style.display = 'none';
+            }
+            deferredPrompt = null;
+        }
+    });
+    
+    window.addEventListener('appinstalled', () => {
+        installBtn.style.display = 'none';
+        deferredPrompt = null;
+    });
     // Mobile navigation toggle
     const navToggle = document.getElementById('nav-toggle');
     const navMenu = document.getElementById('nav-menu');
