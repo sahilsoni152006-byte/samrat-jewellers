@@ -504,7 +504,12 @@ def admin_add_product():
         
         return redirect(url_for('admin_products'))
     
-    return render_template('admin/add_product.html')
+    # Get categories from Firebase
+    categories_ref = db.reference('categories')
+    categories_data = categories_ref.get() or {}
+    categories = [{'id': k, 'name': v['name']} for k, v in categories_data.items() if not v.get('is_hidden', False)]
+    
+    return render_template('admin/add_product.html', categories=categories)
 
 @app.route('/admin/products/edit/<product_id>', methods=['GET', 'POST'])
 def admin_edit_product(product_id):
@@ -556,9 +561,14 @@ def admin_edit_product(product_id):
         product_ref.update(product_data)
         flash('Product updated successfully!', 'success')
         return redirect(url_for('admin_products'))
+
+    # Get categories from Firebase
+    categories_ref = db.reference('categories')
+    categories_data = categories_ref.get() or {}
+    categories = [{'id': k, 'name': v['name']} for k, v in categories_data.items() if not v.get('is_hidden', False)]
     
     product['id'] = product_id
-    return render_template('admin/edit_product.html', product=product)
+    return render_template('admin/edit_product.html', product=product, categories=categories)
 
 @app.route('/admin/products/delete/<product_id>')
 def admin_delete_product(product_id):
