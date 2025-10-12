@@ -6,10 +6,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const installBtn = document.getElementById('install-btn');
     
     window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('beforeinstallprompt fired');
         e.preventDefault();
         deferredPrompt = e;
         installBtn.style.display = 'flex';
     });
+        // Debug: Check if already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('App is already installed');
+    } else {
+        console.log('App is not installed, waiting for install prompt');
+    }
     
     installBtn.addEventListener('click', async () => {
         if (deferredPrompt) {
