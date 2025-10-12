@@ -10,6 +10,7 @@ import uuid
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
 app.config['UPLOAD_FOLDER'] = 'static/images/products'
+app.config['PERMANENT_SESSION_LIFETIME'] = 5184000  # 60 days
 
 # Initialize Firebase
 import json
@@ -354,6 +355,7 @@ def user_login():
     
     if user:
         # Login existing user
+        session.permanent = True
         session['user_mobile'] = mobile
         session['user_name'] = user['name']
         session['user_registered'] = user['registered_date']
@@ -373,7 +375,8 @@ def user_login():
         }
         
         users_ref.child(user_id).set(user_data)
-        
+
+        session.permanent = True
         session['user_mobile'] = mobile
         session['user_name'] = name
         session['user_registered'] = user_data['registered_date']
@@ -404,6 +407,7 @@ def admin_login():
                 break
         
         if user and check_password_hash(user['password_hash'], password):
+            session.permanent = True
             session['user_id'] = user['id']
             session['user_name'] = user['name']
             return redirect(url_for('admin_dashboard'))
