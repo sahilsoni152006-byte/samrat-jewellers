@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Samrat Jewellers - Purity, Elegance, Trust{% endblock %}</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#d4af37">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -25,6 +27,9 @@
                 <a href="{{ url_for('profile') }}" class="nav-link">PROFILE</a>
                 <a href="{{ url_for('contact') }}" class="nav-link">CONTACT</a>
                 <a href="{{ url_for('about') }}" class="nav-link">ABOUT</a>
+                <button id="install-btn" class="install-btn" style="display: none;">
+                    <i class="fas fa-download"></i> Install App
+                </button>
             </div>
 
         </div>
@@ -68,5 +73,18 @@
     </nav>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
