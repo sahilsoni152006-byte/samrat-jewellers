@@ -31,12 +31,9 @@
                     <label for="category">Category *</label>
                     <select id="category" name="category" required>
                         <option value="">Select Category</option>
-                        <option value="Necklaces">Necklaces</option>
-                        <option value="Earrings">Earrings</option>
-                        <option value="Rings">Rings</option>
-                        <option value="Bracelets">Bracelets</option>
-                        <option value="Pendants">Pendants</option>
-                        <option value="Chains">Chains</option>
+                        {% for category in categories %}
+                        <option value="{{ category.name }}">{{ category.name }}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 
