@@ -52,41 +52,76 @@
     </div>
 </section>
 
-<section class="banner-carousel">
+<section class="categories">
     <div class="container">
-        <div class="carousel-container">
-            <div class="carousel-slide active">
-                <div class="banner-content">
-                    <div class="banner-text">
-                        <h2>Festive Gold Collection</h2>
-                        <p>Up to 20% off on making charges</p>
-                        <a href="{{ url_for('shop', category='Gold') }}" class="btn btn-primary">Shop Now</a>
+        <h2>Shop by Category</h2>
+        <div class="categories-grid">
+            {% if categories %}
+                {% for category in categories %}
+                <a href="{{ url_for('shop', category=category.name) }}" class="category-card">
+                    <div class="category-image">
+                        {% if category.image_url %}
+                            <img src="{{ category.image_url }}" alt="{{ category.name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                            <div class="category-placeholder" style="display:none">
+                                <i class="fas fa-gem"></i>
+                            </div>
+                        {% else %}
+                            <div class="category-placeholder">
+                                <i class="fas fa-gem"></i>
+                            </div>
+                        {% endif %}
                     </div>
-                </div>
-            </div>
-            <div class="carousel-slide">
-                <div class="banner-content">
-                    <div class="banner-text">
-                        <h2>Diamond Jewelry</h2>
-                        <p>Exclusive designs starting from ₹15,000</p>
-                        <a href="{{ url_for('shop', category='Diamond') }}" class="btn btn-primary">Explore</a>
+                    <div class="category-overlay">
+                        <h3>{{ category.name }}</h3>
                     </div>
-                </div>
-            </div>
-            <div class="carousel-slide">
-                <div class="banner-content">
-                    <div class="banner-text">
-                        <h2>Silver Collection</h2>
-                        <p>Free home delivery on orders above ₹5,000</p>
-                        <a href="{{ url_for('shop', category='Silver') }}" class="btn btn-primary">View All</a>
+                </a>
+                {% endfor %}
+            {% else %}
+                <a href="{{ url_for('shop', category='Necklaces') }}" class="category-card">
+                    <div class="category-image">
+                        <div class="category-placeholder">
+                            <i class="fas fa-gem"></i>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="carousel-dots">
-                <span class="dot active" onclick="currentSlide(1)"></span>
-                <span class="dot" onclick="currentSlide(2)"></span>
-                <span class="dot" onclick="currentSlide(3)"></span>
-            </div>
+                    <div class="category-overlay">
+                        <h3>Necklaces</h3>
+                        <p>Explore Collection</p>
+                    </div>
+                </a>
+                <a href="{{ url_for('shop', category='Rings') }}" class="category-card">
+                    <div class="category-image">
+                        <div class="category-placeholder">
+                            <i class="fas fa-ring"></i>
+                        </div>
+                    </div>
+                    <div class="category-overlay">
+                        <h3>Rings</h3>
+                        <p>Explore Collection</p>
+                    </div>
+                </a>
+                <a href="{{ url_for('shop', category='Earrings') }}" class="category-card">
+                    <div class="category-image">
+                        <div class="category-placeholder">
+                            <i class="fas fa-circle"></i>
+                        </div>
+                    </div>
+                    <div class="category-overlay">
+                        <h3>Earrings</h3>
+                        <p>Explore Collection</p>
+                    </div>
+                </a>
+                <a href="{{ url_for('shop', category='Chains') }}" class="category-card">
+                    <div class="category-image">
+                        <div class="category-placeholder">
+                            <i class="fas fa-link"></i>
+                        </div>
+                    </div>
+                    <div class="category-overlay">
+                        <h3>Chains</h3>
+                        <p>Explore Collection</p>
+                    </div>
+                </a>
+            {% endif %}
         </div>
     </div>
 </section>
@@ -137,42 +172,6 @@
 </section>
 
 <script>
-let slideIndex = 1;
-let slideInterval;
-
-function currentSlide(n) {
-    showSlide(slideIndex = n);
-    resetInterval();
-}
-
-function showSlide(n) {
-    const slides = document.querySelectorAll('.carousel-slide');
-    const dots = document.querySelectorAll('.dot');
-    
-    if (n > slides.length) { slideIndex = 1; }
-    if (n < 1) { slideIndex = slides.length; }
-    
-    slides.forEach(slide => slide.classList.remove('active'));
-    dots.forEach(dot => dot.classList.remove('active'));
-    
-    slides[slideIndex - 1].classList.add('active');
-    dots[slideIndex - 1].classList.add('active');
-}
-
-function nextSlide() {
-    showSlide(slideIndex += 1);
-}
-
-function resetInterval() {
-    clearInterval(slideInterval);
-    slideInterval = setInterval(nextSlide, 4000);
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    showSlide(slideIndex);
-    slideInterval = setInterval(nextSlide, 4000);
-});
-
 function searchProducts() {
     const searchTerm = document.getElementById('homeSearchInput').value.toLowerCase();
     if (searchTerm.length > 0) {
@@ -180,12 +179,10 @@ function searchProducts() {
     }
 }
 
-if (document.getElementById('homeSearchInput')) {
-    document.getElementById('homeSearchInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            searchProducts();
-        }
-    });
-}
+document.getElementById('homeSearchInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        searchProducts();
+    }
+});
 </script>
 {% endblock %}
